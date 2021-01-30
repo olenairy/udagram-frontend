@@ -1,28 +1,24 @@
-# Use NodeJS base image
-FROM node:13
+# 
+FROM node:13-alpine as build
+
 
 WORKDIR /usr/src/app
  
-COPY nginx.conf /etc/nginx/nginx.conf
+ # Install app dependencies by copying
+# package.json and package-lock.json
+COPY package*.json ./
 
-COPY . .
 
+RUN npm install -g ionic
+
+# Install dependencies
 RUN npm install
 
-RUN npm run build
+# Bundle app source
+COPY . .
 
-RUN apt-get update \
-    && apt-get install -y nginx --option=Dpkg::Options::=--force-confdef\
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    && echo "daemon off;" >> /etc/nginx/nginx.conf
-
-WORKDIR /www/data
-
-# Create app directory
-RUN mv /usr/src/app/www/* /www/data/. && rm -rf /usr/src/app
-
-EXPOSE 8080
-
-CMD ["nginx"]
+#RUN npm run-script build:prod
+FROM nginx:alpine
+RUN rm -rf /usr/share/nginx/html/*
+#COPY --from=build /app/www/ /usr/share/nginx/html/
 
