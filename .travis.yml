@@ -15,9 +15,9 @@ before_script:
 
 script:
   - docker --version # print the version for logging
-  - docker build -t simple-node .
-  - docker tag simple-node olenairy/simple-node:latest
+  - docker build -t udagram-frontend .
+  - docker tag udagram-frontend olenairy/udagram-frontend:latest
 
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push olenairy/simple-node
+  - docker push olenairy/udagram-frontend
